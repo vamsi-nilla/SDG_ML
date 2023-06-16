@@ -22,7 +22,7 @@ class Autogen_variable_data_gen():
         iterations = parameter_split[1].split('-')[1]
         static_value  = parameter_split[0].split('=')[1]
         static_list = static_value.split(',')
-        result_df_temp[column_name] = static_list* int(extracted_json['Number_of_Records'])
+        result_df_temp[column_name] = static_list* int(extracted_json['NumOfRecords'])
         result_df = result_df_temp.loc[sorted([*result_df_temp.index] * int(iterations))].reset_index(drop=True)
         return (result_df)
 
@@ -30,6 +30,8 @@ class Autogen_variable_data_gen():
 
 
     def WBS_ID(self,column_name, parameter_value, Data_dependency, json_ui, concat_dataframe):
+
+        print("RL wbs id")
 
         if Data_dependency.lower()=='N'.lower():
             #print("function_wbs_id")
@@ -39,11 +41,11 @@ class Autogen_variable_data_gen():
             #print(extracted_json['Number_of_Records'])
             parameter_value_list = parameter_value.split(',')
             #print(parameter_value_list)
-            number_of_l2_records = extracted_json['L2_levels']
+            number_of_l2_records = extracted_json['NoofL2_levels']
 
             try:
                 string_list = []
-                for i in range(extracted_json['Number_of_Records']):
+                for i in range(extracted_json['NumOfRecords']):
                     string_value = ""
 
                     for param in parameter_value_list:
@@ -106,18 +108,18 @@ class Autogen_variable_data_gen():
 
         result_df = pd.DataFrame([])
         extracted_json = json.loads(json_ui)
-        number_of_l2_required = int(extracted_json['L2_levels'])
+        number_of_l2_required = int(extracted_json['NoofL2_levels'])
         parameter_value_split = parameter_value.split(',')
         iterations_split = parameter_value_split[2].split('-')
         iterations = iterations_split[1]
 
         if parameter_value_split[0].lower() == 'start'.lower():
-            value = extracted_json['Current_date']
+            value = extracted_json['Start Date']
         else:
-            value = extracted_json['Finished_date']
+            value = extracted_json['End Date']
 
         value_list.append(value)
-        value_list_iter = value_list*int(iterations)*int(extracted_json['Number_of_Records']*int(number_of_l2_required))
+        value_list_iter = value_list*int(iterations)*int(extracted_json['NumOfRecords']*int(number_of_l2_required))
         result_df[column_name] = value_list_iter
         return(result_df)
 

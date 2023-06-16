@@ -18,7 +18,7 @@ class Default_data_gen():
         result_dataframe = pd.DataFrame([])
         extracted_json = json.loads(json_ui)
         #print('result_dataframe',result_dataframe)
-        number_of_l2_required = int(extracted_json['L2_levels'])
+        number_of_l2_required = int(extracted_json['NoofL2_levels'])
 
         for index,row in Pickle_file_locations.iterrows():
             if row['Pikcle_file_description'].lower()==Pikcle_file_description.lower():
@@ -30,7 +30,7 @@ class Default_data_gen():
 
         #print(extracted_json['Number_of_Records'])
         #synthetic_temp_df = synthesizer.
-        synthetic_data_temp = synthesizer.sample(num_rows= iterations*int(extracted_json['Number_of_Records']))
+        synthetic_data_temp = synthesizer.sample(num_rows= iterations*int(extracted_json['NumOfRecords']))
 
         if number_of_l2_required == int(1):
             synthetic_data = synthetic_data_temp

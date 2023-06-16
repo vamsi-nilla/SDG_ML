@@ -19,11 +19,11 @@ class Text_data_gen():
         result_dataframe = pd.DataFrame([])
         extracted_json = json.loads(json_ui)
         #print('result_dataframe',result_dataframe)
-        number_of_l2_required = int(extracted_json['L2_levels'])
-
+        number_of_l2_required = int(extracted_json['NoofL2_levels'])
+        print("post1",extracted_json['POST1'],type(extracted_json['POST1']))
 
         for index,row in Pickle_file_locations.iterrows():
-            if row['Pikcle_file_description'].lower() == Pikcle_file_description.lower():
+            if row['Pikcle_file_description'].lower()==Pikcle_file_description.lower():
                 saved_location = row['Saved_location']
 
 
@@ -31,13 +31,13 @@ class Text_data_gen():
             filepath=saved_location
         )
 
-        print(extracted_json['Number_of_Records'])
-        synthetic_data_temp = synthesizer.sample(num_rows=int(extracted_json['Number_of_Records']))
+        print(extracted_json['NumOfRecords'])
+        synthetic_data_temp = synthesizer.sample(num_rows=int(extracted_json['NumOfRecords']))
 
         if str(extracted_json['POST1']) != str(0):
             print(extracted_json['POST1'])
             text_list = []
-            for i in range(int(extracted_json['Number_of_Records'])):
+            for i in range(int(extracted_json['NumOfRecords'])):
                 txt_value = str(extracted_json['POST1'])+'_'+str(i)
                 text_list.append(txt_value)
             txt_columns_list = synthetic_data_temp.columns.tolist()
