@@ -6,6 +6,7 @@ from SDV_BULK_API_FILE.SDV_BULK_Backend_data_gen import Backend_data_gen
 from SDV_BULK_API_FILE.SDV_BULK_Text_data_gen import Text_data_gen
 from SDV_BULK_API_FILE.SDV_BULK_Autogen_Class_Rule_dep_file import Autogen_variable_rule_dep_data_gen
 from SDV_BULK_API_FILE.SDV_BULK_GET_Data_Display import Generated_data_display
+from SDV_BULK_API_FILE.SDV_BULK_DB_DataSet_file import DB_Updates
 import pandas as pd
 import numpy as np
 import datetime
@@ -35,13 +36,33 @@ class Bulk_Driver():
 
         print(input_data_dictionary, "input_data_dictionary")
 
-        #input_data_dictionary['random_state'] = random.randint(1, 50000)
+        DB_Updates_object = DB_Updates()
 
+        input_data_dictionary['DatasetUID'] = DB_Updates_object.Generate_DatasetUID(input_data_dictionary)
+        header['DatasetUID'] = input_data_dictionary['DatasetUID']
+        DB_Updates_object.Insert_Dataset(input_data_dictionary)
+        DB_Status_dictionary = DB_Updates_object.Get_DB_Status_values()
         json_ui = json.dumps(input_data_dictionary)
+        Input_Draft_Data_return_value = DB_Updates_object.Input_Draft_Data(header,body_list)
 
-        start = time.time()
-        if int(input_data_dictionary['NumOfRecords']) != int(0):
 
+
+
+
+        if input_data_dictionary['Action'].lower()=='Draft'.lower():
+            print("Status is Draft")
+            status = DB_Status_dictionary[1]
+            DB_Updates_object.Update_DataSet(input_data_dictionary, status)
+            draft_value_response = DB_Updates_object.Draft_Values_response(header,DB_Status_dictionary)
+            print("bulk",draft_value_response)
+            return draft_value_response
+
+
+
+
+        elif ((int(input_data_dictionary['NumOfRecords']) != int(0)) and(input_data_dictionary['Action'].lower()=='Generate'.lower())):
+
+            start = time.time()
             concat_dataframe = pd.DataFrame([])
 
             try:
@@ -68,6 +89,8 @@ class Bulk_Driver():
                 Display_data_columns = Display_data.tolist()
                 print(Display_data_columns)
 
+                status = DB_Status_dictionary[2]
+                DB_Updates_object.Update_DataSet(input_data_dictionary,status)
 
                 sdv_metadata_Rule_indicator_list = sdv_metadata['Rule_indicator'].unique().tolist()
                 #sdv_metadata_Rule_indicator_list.sort()
@@ -200,14 +223,20 @@ class Bulk_Driver():
                 print("The time of execution of above program is :",
                       (end - start) * 10 ** 3, "ms")
                 concat_dataframe.to_excel(
-                    r'C:\Users\vamsikkrishna\PycharmProjects\pythonProject1\sample_synthetic\concat_dataframe_final.xlsx')
-                #print("bulk_updated_concat_dict",concat_dataframe)
-                #print("bulk_updated_input_dict", input_data_dictionary)
-                #return [concat_dataframe,input_data_dictionary]
+                    r'C:\Users\vamsikkrishna\PycharmProjects\pythonProject1\sample_synthetic\concat_dataframe_final.xlsx',index=False)
+
+                DB_Updates_object.Update_DataSet_Log(input_data_dictionary,concat_dataframe)
+
+                status = DB_Status_dictionary[3]
+                DB_Updates_object.Update_DataSet(input_data_dictionary,status)
+
+
 
             except Exception as e:
                 print(e)
+                status = DB_Status_dictionary[4]
+                DB_Updates_object.Update_DataSet(input_data_dictionary, status)
             print("returning statement bulk")
-        # print("bulk_updated_concat_dict", concat_dataframe)
-        # print("bulk_updated_input_dict", input_data_dictionary)
+
+
         return[concat_dataframe,input_data_dictionary]
